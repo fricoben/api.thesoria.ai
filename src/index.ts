@@ -28,17 +28,24 @@ console.log('------------------------');
 
 const app = express();
 
-// CORS configuration
+// Make sure this is the FIRST middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://thesoria.ai'],  // Add your frontend URLs here
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type'],
+    origin: 'https://thesoriaai.vercel.app', // Try with exact string instead of array
+    methods: ['GET', 'POST', 'OPTIONS'],      // Added OPTIONS explicitly
+    allowedHeaders: ['Content-Type', 'Authorization'], // Add specific headers
     credentials: true
 }));
 
 app.use(express.json());
 
 app.use('/', subscribeRouter);
+
+app.get('/test-cors', (req, res) => {
+    res.json({ message: 'CORS is working!' });
+});
+
+// Optional: Add error handling for CORS preflight
+app.options('*', cors()); // Enable pre-flight for all routes
 
 // Add this if you want to run the server locally
 if (process.env.NODE_ENV !== 'production') {
