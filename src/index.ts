@@ -27,6 +27,12 @@ console.log('------------------------');
 
 const app = express();
 
+// Middleware to remove double slashes
+app.use((req, res, next) => {
+    req.url = req.url.replace(/\/+/g, '/');
+    next();
+});
+
 app.use(express.json());
 
 app.use('/', subscribeRouter);
