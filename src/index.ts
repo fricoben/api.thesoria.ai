@@ -1,6 +1,7 @@
 import express from 'express';
 import subscribeRouter from './subscribe';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 // Load environment variables
 dotenv.config();
@@ -27,6 +28,18 @@ console.log('------------------------');
 
 const app = express();
 
+// Configure CORS
+const corsOptions = {
+    origin: ['https://thesoriaai.vercel.app', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+// Apply CORS middleware before other routes
+app.use(cors(corsOptions));
+
 // Middleware to remove double slashes
 app.use((req, res, next) => {
     req.url = req.url.replace(/\/+/g, '/');
@@ -48,5 +61,9 @@ if (process.env.NODE_ENV !== 'production') {
         console.log(`🚀 Server running on port ${port}`);
     });
 }
+
+app.options('*', (req, res) => {
+    res.status(200).end();
+});
 
 export const handler = app; 
