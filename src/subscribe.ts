@@ -11,6 +11,21 @@ console.log('🔄 Initializing Notion configuration:', {
     databaseId: process.env.NOTION_DATABASE_ID
 });
 
+interface NotionPageResponse {
+    object: 'page';
+    id: string;
+    created_time: string;
+    last_edited_time: string;
+    parent: {
+        type: 'database_id';
+        database_id: string;
+    };
+    properties: {
+        [key: string]: any; // We can be less strict here since we don't need all properties
+    };
+    url: string;
+}
+
 router.post('/subscribe', async (req, res) => {
     try {
         const { name, email } = req.body;
@@ -58,7 +73,7 @@ router.post('/subscribe', async (req, res) => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
+                const errorData = await response.json() as { message?: string };
                 console.error('❌ Notion API Error:', {
                     status: response.status,
                     error: errorData
@@ -74,7 +89,7 @@ router.post('/subscribe', async (req, res) => {
                 throw new Error(`Notion API error: ${response.status}`);
             }
 
-            const data = await response.json();
+            const data = await response.json() as NotionPageResponse;
             console.log('✅ Successfully created Notion page:', data.id);
             res.status(200).json({ message: 'Inscription réussie!' });
             return;
