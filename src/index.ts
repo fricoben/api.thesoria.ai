@@ -32,10 +32,30 @@ app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/', subscribeRouter);
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+    console.log(`📨 Incoming ${req.method} request to ${req.path}`, {
+        headers: req.headers,
+        body: req.body
+    });
+    next();
+});
 
+// Mount the subscribe router at /subscribe explicitly
+app.use('/subscribe', subscribeRouter);
+
+// Test endpoint
 app.get('/test-cors', (req, res) => {
     res.json({ message: 'API is working!' });
+});
+
+// Add a catch-all route for undefined routes
+app.use('*', (req, res) => {
+    res.status(404).json({
+        message: 'Route not found',
+        path: req.originalUrl,
+        method: req.method
+    });
 });
 
 // Add this if you want to run the server locally
@@ -46,4 +66,5 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-export const handler = app; 
+// Export the Express app as a serverless function handler
+module.exports = app; 

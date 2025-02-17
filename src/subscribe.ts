@@ -26,9 +26,16 @@ interface NotionPageResponse {
     url: string;
 }
 
-router.post('/subscribe', async (req, res) => {
+// The router is mounted at /subscribe, so this handles POST /subscribe
+router.post('/', async (req, res) => {
     try {
         let name, email;
+
+        // Log the raw request
+        console.log('📝 Raw request:', {
+            body: req.body,
+            contentType: req.headers['content-type']
+        });
 
         // Handle different content types
         const contentType = req.headers['content-type'];
@@ -38,7 +45,7 @@ router.post('/subscribe', async (req, res) => {
             try {
                 ({ name, email } = JSON.parse(req.body));
             } catch (e) {
-                console.log('❌ Failed to parse text/plain body as JSON');
+                console.log('❌ Failed to parse text/plain body as JSON:', e);
                 res.status(400).json({ message: 'Invalid request body format' });
                 return;
             }
@@ -50,7 +57,7 @@ router.post('/subscribe', async (req, res) => {
             return;
         }
 
-        console.log('📝 Received subscription request:', { name, email, contentType });
+        console.log('📝 Processed subscription request:', { name, email, contentType });
 
         if (!name || !email) {
             console.log('❌ Missing required fields');
