@@ -1,6 +1,22 @@
 import { Router } from 'express';
+import cors from 'cors';
 
 const router = Router();
+
+// Add CORS configuration
+const corsOptions = {
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://thesoriaai.vercel.app',
+        'https://thesoriaai.vercel.com'  // Adding both .app and .com to be safe
+    ],
+    methods: ['POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true,
+};
+
+router.use(cors(corsOptions));
 
 const NOTION_API_URL = 'https://api.notion.com/v1';
 
