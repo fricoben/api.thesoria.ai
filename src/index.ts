@@ -1,5 +1,4 @@
 import express from 'express';
-import cors from 'cors';
 import subscribeRouter from './subscribe';
 import dotenv from 'dotenv';
 
@@ -28,24 +27,15 @@ console.log('------------------------');
 
 const app = express();
 
-// CORS middleware
-app.use(cors({
-    origin: ['https://thesoriaai.vercel.app', 'http://localhost:5173'],
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    optionsSuccessStatus: 200
-}));
-
-// Handle preflight requests
-app.options('*', cors());
-
+// Add content type parsing for different formats
 app.use(express.json());
+app.use(express.text());
+app.use(express.urlencoded({ extended: true }));
 
 app.use('/', subscribeRouter);
 
 app.get('/test-cors', (req, res) => {
-    res.json({ message: 'CORS is working!' });
+    res.json({ message: 'API is working!' });
 });
 
 // Add this if you want to run the server locally

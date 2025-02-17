@@ -28,8 +28,29 @@ interface NotionPageResponse {
 
 router.post('/subscribe', async (req, res) => {
     try {
-        const { name, email } = req.body;
-        console.log('📝 Received subscription request:', { name, email });
+        let name, email;
+
+        // Handle different content types
+        const contentType = req.headers['content-type'];
+        if (contentType?.includes('application/json')) {
+            ({ name, email } = req.body);
+        } else if (contentType?.includes('text/plain')) {
+            try {
+                ({ name, email } = JSON.parse(req.body));
+            } catch (e) {
+                console.log('❌ Failed to parse text/plain body as JSON');
+                res.status(400).json({ message: 'Invalid request body format' });
+                return;
+            }
+        } else if (contentType?.includes('application/x-www-form-urlencoded')) {
+            ({ name, email } = req.body);
+        } else {
+            console.log('❌ Unsupported content type:', contentType);
+            res.status(400).json({ message: 'Unsupported content type' });
+            return;
+        }
+
+        console.log('📝 Received subscription request:', { name, email, contentType });
 
         if (!name || !email) {
             console.log('❌ Missing required fields');
